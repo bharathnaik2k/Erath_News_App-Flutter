@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class SplashScreen extends StatelessWidget {
-  const SplashScreen({super.key});
+class SplashScreenWidget extends StatelessWidget {
+  const SplashScreenWidget({super.key});
 
   void naviFun(BuildContext context) {
     Future.delayed(const Duration(milliseconds: 1800), () {
-      Navigator.of(context).pushReplacementNamed("/HomeScreen");
+      Navigator.of(context).pushReplacementNamed("/HomeScreen",);
     });
   }
 

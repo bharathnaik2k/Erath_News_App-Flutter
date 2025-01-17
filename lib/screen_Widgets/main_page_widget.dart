@@ -1,29 +1,37 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:news_app/api/api_adress.dart';
 import 'package:news_app/api/apikey.dart';
-import 'package:news_app/screen_Widgets/homeScreen_Widget/homescreen.dart';
-import 'package:news_app/screen_Widgets/homeScreen_Widget/sportsscreen.dart';
-import 'package:news_app/screen_Widgets/homeScreen_Widget/techworldscreen.dart';
-import 'package:news_app/screen_Widgets/homeScreen_Widget/trendingscreen.dart';
+import 'package:news_app/screen_Widgets/mainPage_Widget/home_screen.dart';
+import 'package:news_app/screen_Widgets/mainPage_Widget/sports_screen.dart';
+import 'package:news_app/screen_Widgets/mainPage_Widget/techworld_screen.dart';
+import 'package:news_app/screen_Widgets/mainPage_Widget/trending_screen.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class MainPageWidget extends StatefulWidget {
+  const MainPageWidget({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageWidget();
+  State<MainPageWidget> createState() => _MainPageWidgetWidget();
 }
 
-class _HomePageWidget extends State<HomePage> {
-  var dataImage = [];
+class _MainPageWidgetWidget extends State<MainPageWidget> {
+  List<Map<String, dynamic>?> topSliderData = [];
+  List<Map<String, dynamic>?> letestNewsData = [];
+  PageController pageController = PageController();
+  int pageIndex = 0;
+
+  void onPageChanged() {
+    setState(() {
+      pageController.jumpToPage(pageIndex);
+    });
+  }
 
   Future<dynamic> getdata() async {
-    dynamic url = "$baseURL$topSilderNewsURL$apiKey";
+    dynamic url = "$baseURL$topSliderEndPoint$apiKey";
     dynamic uri = Uri.parse(url);
     var response = await http.get(uri);
     var decode = jsonDecode(response.body);
@@ -31,7 +39,7 @@ class _HomePageWidget extends State<HomePage> {
       log("${response.statusCode}");
       for (var image in decode["articles"]) {
         setState(() {
-          dataImage.add(image);
+          topSliderData.add(image);
         });
       }
     } else {
@@ -40,10 +48,8 @@ class _HomePageWidget extends State<HomePage> {
     return null;
   }
 
-  List<Map<String, dynamic>?> mainLineData = [];
-
   Future<dynamic> getMainLineNewsdata() async {
-    dynamic url = "$baseURL$mainLine$apiKey";
+    dynamic url = "$baseURL$letestNewsEndPoint$apiKey";
     dynamic uri = Uri.parse(url);
     var response = await http.get(uri);
     var decode = jsonDecode(response.body);
@@ -51,7 +57,7 @@ class _HomePageWidget extends State<HomePage> {
       log("${response.statusCode}");
       for (var image in decode["articles"]) {
         setState(() {
-          mainLineData.add(image);
+          letestNewsData.add(image);
         });
       }
     } else {
@@ -67,60 +73,11 @@ class _HomePageWidget extends State<HomePage> {
     super.initState();
   }
 
-  CarouselSliderController buttonCarouselController =
-      CarouselSliderController();
-
-  int pageIndex = 0;
-  onPageChanged() {
-    setState(() {
-      pageController.jumpToPage(pageIndex);
-    });
-  }
-
-  PageController pageController = PageController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar(),
-      drawer: Drawer(
-        backgroundColor: const Color.fromARGB(255, 74, 94, 0),
-        child: Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(
-                  "assets/images/erathPic.png",
-                ),
-                fit: BoxFit.cover,
-                opacity: 0.3,
-              ),
-            ),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.newspaper,
-                  size: 80,
-                  color: Colors.white,
-                ),
-                Text(
-                  "Erath News",
-                  style: TextStyle(
-                    fontSize: 28,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 18),
-                Text(
-                  "# WorldWide Letest News in Your Fingertip",
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            )),
-      ),
+      drawer: drawer(),
       body: Column(
         children: [
           Padding(
@@ -221,8 +178,8 @@ class _HomePageWidget extends State<HomePage> {
               },
               children: [
                 HomeScreen(
-                  dataImage: dataImage,
-                  mainLineData: mainLineData,
+                  topSliderData: topSliderData,
+                  letestNewsData: letestNewsData,
                 ),
                 const TrendingScreen(),
                 const SportsScreen(),
@@ -252,6 +209,49 @@ class _HomePageWidget extends State<HomePage> {
             ),
           )
         ],
+      ),
+    );
+  }
+
+  Drawer drawer() {
+    return Drawer(
+      backgroundColor: const Color.fromARGB(255, 74, 94, 0),
+      child: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(
+              "assets/images/erathPic.png",
+            ),
+            fit: BoxFit.cover,
+            opacity: 0.3,
+          ),
+        ),
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.newspaper,
+              size: 80,
+              color: Colors.white,
+            ),
+            Text(
+              "Erath News",
+              style: TextStyle(
+                fontSize: 28,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(height: 18),
+            Text(
+              "# WorldWide Letest News in Your Fingertip",
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
